@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 
 DeviceHUB.net sample code for sending an analog sensor.
@@ -13,37 +14,30 @@ by Alexandru Gheorghe
 """
 
 
-from devicehub import Sensor, Actuator, Device, Project
-import threading
+from devicehub import Sensor, Device, Project
 from time import sleep
+from random import randint
 
-PROJECT_ID      = 'paste_your_PROJECT_ID_here'
-DEVICE_UUID     = 'paste_your_DEVICE_UUID_here'
-API_KEY         = 'paste_your_API_KEY_here'
-AN_SENSOR_NAME  = 'paste_your_analog_SENSOR_NAME_here'
+PROJECT_ID      = '4586'
+DEVICE_UUID     = '0960c350-dee7-4c25-87a2-fa32164d5c16'
+API_KEY         = '6ccd115d-5131-407f-b76f-5158fa4889bb'
+AN_SENSOR_NAME  = 'CONS_PH1'
 
-# simulation for sensor
-InputAnalog = 42
 
-def gpio_input(gpio_input, device, sensor):
-    global InputAnalog
-     
-    sensor.addValue(gpio_input)
-    device.send()
-    print gpio_input
+def analog_input(dev, sensor):
+    value = randint(0, 1023)
+    sensor.addValue(value)
+    dev.send()
+    print value
     return
 
-project = Project(PROJECT_ID)
+project = Project(PROJECT_ID, ssl_verify=False)
 device = Device(project, DEVICE_UUID, API_KEY)
 
 AN1 = Sensor(Sensor.ANALOG, AN_SENSOR_NAME)
 
 device.addSensor(AN1)
 
-threads = []
-
 while True:
-    t1 = threading.Thread(target=gpio_input, args=(InputAnalog, device, AN1))
-    threads.append(t1)
-    t1.start()
+    analog_input(device, AN1)
     sleep(5.0)
